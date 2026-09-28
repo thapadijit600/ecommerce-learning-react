@@ -45,7 +45,7 @@ const AboutHero = () => {
             </Link>
 
             <Link
-              to="/contact"
+              to="/Contact"
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-bold text-white transition-all duration-200 hover:bg-white/10"
             >
               Contact Us

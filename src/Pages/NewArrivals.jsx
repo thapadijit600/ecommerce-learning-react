@@ -1,838 +1,856 @@
+
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  FaSearch,
+  FaHeart,
+  FaShoppingCart,
+  FaStar,
   FaArrowRight,
   FaBolt,
-  FaBoxOpen,
-  FaCartPlus,
-  FaCheckCircle,
-  FaChevronDown,
-  FaHeart,
-  FaSearch,
-  FaShippingFast,
-  FaStar,
+  FaCheck,
+  FaFilter,
   FaTimes,
+  FaChevronDown,
+  FaEye,
+  FaTag,
 } from "react-icons/fa";
+
+/* =========================================================
+   STORAGE KEYS
+========================================================= */
+
+const CART_KEY = "shop_zone_cart";
+const WISHLIST_KEY = "shop_zone_wishlist";
+
+/* =========================================================
+   NEW ARRIVAL PRODUCTS
+========================================================= */
 
 const newProducts = [
   {
-    id: 1,
-    name: "Apple AirPods Pro 2",
-    category: "Electronics",
-    price: 34999,
-    oldPrice: 39999,
-    rating: 4.8,
-    reviews: 124,
-    badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1588423771077-4d6b2b0f4f2f?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 2,
-    name: "Premium Casual Sneakers",
-    category: "Fashion",
-    price: 5499,
-    oldPrice: 6999,
-    rating: 4.7,
-    reviews: 86,
-    badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 3,
-    name: "Smart LED Table Lamp",
-    category: "Home & Living",
-    price: 2499,
-    oldPrice: 2999,
-    rating: 4.6,
-    reviews: 53,
-    badge: "Just In",
-    image:
-      "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 4,
-    name: "Minimalist Leather Backpack",
-    category: "Accessories",
-    price: 3999,
-    oldPrice: 4999,
+    id: 101,
+    name: "Apple iPhone 16",
+    category: "Mobile",
+    price: 124999,
+    oldPrice: 134999,
     rating: 4.9,
-    reviews: 112,
+    reviews: 42,
+    image:
+      "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=700&q=80",
     badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    description:
+      "Experience powerful performance with the latest iPhone technology.",
   },
   {
-    id: 5,
-    name: "Wireless Mechanical Keyboard",
-    category: "Electronics",
-    price: 7299,
-    oldPrice: 8499,
-    rating: 4.7,
-    reviews: 71,
-    badge: "Trending",
-    image:
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 6,
-    name: "Oversized Cotton T-Shirt",
-    category: "Fashion",
-    price: 1899,
-    oldPrice: 2499,
-    rating: 4.5,
-    reviews: 94,
-    badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 7,
-    name: "Premium Skincare Set",
-    category: "Beauty",
-    price: 3199,
-    oldPrice: 3999,
+    id: 102,
+    name: "Premium Running Shoes",
+    category: "Footwear",
+    price: 6499,
+    oldPrice: 7999,
     rating: 4.8,
-    reviews: 64,
-    badge: "Just In",
+    reviews: 35,
     image:
-      "https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 8,
-    name: "Professional Football",
-    category: "Sports",
-    price: 2299,
-    oldPrice: 2799,
-    rating: 4.6,
-    reviews: 48,
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80",
     badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?auto=format&fit=crop&w=900&q=80",
+    description:
+      "Lightweight and comfortable running shoes for everyday performance.",
   },
   {
-    id: 9,
-    name: "Smart Fitness Watch",
-    category: "Electronics",
+    id: 103,
+    name: "Wireless Headphones Pro",
+    category: "Audio",
     price: 8999,
     oldPrice: 10999,
     rating: 4.7,
-    reviews: 137,
-    badge: "Trending",
+    reviews: 28,
     image:
-      "https://images.unsplash.com/photo-1544117519-31a4b719223d?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 10,
-    name: "Modern Ceramic Vase",
-    category: "Home & Living",
-    price: 1799,
-    oldPrice: 2299,
-    rating: 4.5,
-    reviews: 39,
-    badge: "New",
-    image:
-      "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 11,
-    name: "Classic Sunglasses",
-    category: "Accessories",
-    price: 2199,
-    oldPrice: 2999,
-    rating: 4.6,
-    reviews: 58,
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80",
     badge: "Just In",
-    image:
-      "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=900&q=80",
+    description:
+      "Enjoy immersive sound with premium wireless headphones.",
   },
   {
-    id: 12,
-    name: "Running Performance Shoes",
-    category: "Sports",
-    price: 4799,
-    oldPrice: 5999,
-    rating: 4.8,
-    reviews: 101,
-    badge: "New",
+    id: 104,
+    name: "Smart Laptop X15",
+    category: "Electronics",
+    price: 119999,
+    oldPrice: 129999,
+    rating: 4.9,
+    reviews: 51,
     image:
-      "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=80",
+    badge: "New",
+    description:
+      "Powerful laptop designed for work, coding, editing and entertainment.",
+  },
+  {
+    id: 105,
+    name: "Modern Backpack",
+    category: "Bags",
+    price: 3499,
+    oldPrice: 4499,
+    rating: 4.6,
+    reviews: 19,
+    image:
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80",
+    badge: "New",
+    description:
+      "A stylish and durable backpack for travel, school and work.",
+  },
+  {
+    id: 106,
+    name: "Smart Watch Series 5",
+    category: "Wearables",
+    price: 15999,
+    oldPrice: 18999,
+    rating: 4.8,
+    reviews: 44,
+    image:
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80",
+    badge: "Trending",
+    description:
+      "Track your fitness and stay connected with a modern smartwatch.",
+  },
+  {
+    id: 107,
+    name: "Digital Camera 4K",
+    category: "Cameras",
+    price: 89999,
+    oldPrice: 99999,
+    rating: 4.8,
+    reviews: 23,
+    image:
+      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=700&q=80",
+    badge: "New",
+    description:
+      "Capture high-quality photos and videos with advanced 4K technology.",
+  },
+  {
+    id: 108,
+    name: "Gaming Controller",
+    category: "Gaming",
+    price: 5999,
+    oldPrice: 6999,
+    rating: 4.7,
+    reviews: 31,
+    image:
+      "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?auto=format&fit=crop&w=700&q=80",
+    badge: "Just In",
+    description:
+      "Take your gaming experience to the next level with a responsive controller.",
   },
 ];
 
-const categories = [
-  "All",
-  "Electronics",
-  "Fashion",
-  "Home & Living",
-  "Beauty",
-  "Sports",
-  "Accessories",
-];
+/* =========================================================
+   FORMAT PRICE
+========================================================= */
+
+const formatPrice = (price) => {
+  return `Rs. ${price.toLocaleString("en-IN")}`;
+};
+
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
+
+const ProductCard = ({
+  product,
+  isWishlisted,
+  onWishlist,
+  onAddToCart,
+}) => {
+  const discount = Math.round(
+    ((product.oldPrice - product.price) /
+      product.oldPrice) *
+      100
+  );
+
+  return (
+    <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/60">
+      {/* =================================================
+          IMAGE
+      ================================================= */}
+
+      <div className="relative overflow-hidden bg-slate-100">
+        <Link to={`/products/${product.id}`}>
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-60 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-64"
+            loading="lazy"
+          />
+        </Link>
+
+        {/* BADGE */}
+
+        <span className="absolute left-3 top-3 rounded-full bg-emerald-600 px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-white shadow-lg">
+          {product.badge}
+        </span>
+
+        {/* DISCOUNT */}
+
+        {discount > 0 && (
+          <span className="absolute right-3 top-3 rounded-full bg-rose-500 px-2.5 py-1.5 text-[10px] font-black text-white">
+            -{discount}%
+          </span>
+        )}
+
+        {/* WISHLIST */}
+
+        <button
+          type="button"
+          onClick={() => onWishlist(product)}
+          aria-label={
+            isWishlisted
+              ? `Remove ${product.name} from wishlist`
+              : `Add ${product.name} to wishlist`
+          }
+          className={`absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg transition ${
+            isWishlisted
+              ? "text-rose-500"
+              : "text-slate-500 hover:text-rose-500"
+          }`}
+        >
+          <FaHeart
+            className={
+              isWishlisted ? "scale-110" : ""
+            }
+          />
+        </button>
+
+        {/* QUICK VIEW */}
+
+        <Link
+          to={`/products/${product.id}`}
+          className="absolute bottom-3 left-3 flex h-10 w-10 translate-y-2 items-center justify-center rounded-full bg-white text-slate-600 opacity-0 shadow-lg transition duration-300 hover:text-emerald-600 group-hover:translate-y-0 group-hover:opacity-100"
+          aria-label={`View ${product.name}`}
+        >
+          <FaEye />
+        </Link>
+      </div>
+
+      {/* =================================================
+          CONTENT
+      ================================================= */}
+
+      <div className="p-4 sm:p-5">
+        {/* CATEGORY */}
+
+        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-emerald-600">
+          {product.category}
+        </p>
+
+        {/* NAME */}
+
+        <Link to={`/products/${product.id}`}>
+          <h3 className="mt-1 line-clamp-1 text-base font-black text-slate-900 transition hover:text-emerald-600">
+            {product.name}
+          </h3>
+        </Link>
+
+        {/* DESCRIPTION */}
+
+        <p className="mt-2 line-clamp-2 min-h-[40px] text-xs leading-5 text-slate-500">
+          {product.description}
+        </p>
+
+        {/* RATING */}
+
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex items-center gap-1 text-amber-400">
+            <FaStar className="text-xs" />
+            <span className="text-xs font-black text-slate-700">
+              {product.rating}
+            </span>
+          </div>
+
+          <span className="text-xs text-slate-400">
+            ({product.reviews} reviews)
+          </span>
+        </div>
+
+        {/* PRICE */}
+
+        <div className="mt-4 flex items-end gap-2">
+          <span className="text-lg font-black text-slate-950">
+            {formatPrice(product.price)}
+          </span>
+
+          <span className="pb-0.5 text-xs font-medium text-slate-400 line-through">
+            {formatPrice(product.oldPrice)}
+          </span>
+        </div>
+
+        {/* ADD TO CART */}
+
+        <button
+          type="button"
+          onClick={() => onAddToCart(product)}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-xs font-black text-white transition hover:bg-emerald-600"
+        >
+          <FaShoppingCart />
+          Add to Cart
+        </button>
+      </div>
+    </article>
+  );
+};
+
+/* =========================================================
+   NEW ARRIVALS PAGE
+========================================================= */
 
 const NewArrivals = () => {
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
   const [sortBy, setSortBy] = useState("newest");
+  const [showFilters, setShowFilters] = useState(false);
   const [wishlist, setWishlist] = useState([]);
-  const [cartMessage, setCartMessage] = useState("");
-  const [quickView, setQuickView] = useState(null);
 
-  const toggleWishlist = (id) => {
-    setWishlist((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
-    );
+  /* =======================================================
+     CATEGORY LIST
+  ======================================================= */
+
+  const categories = useMemo(() => {
+    return [
+      "All",
+      ...new Set(newProducts.map((product) => product.category)),
+    ];
+  }, []);
+
+  /* =======================================================
+     LOAD WISHLIST
+  ======================================================= */
+
+  useMemo(() => {
+    try {
+      const savedWishlist =
+        localStorage.getItem(WISHLIST_KEY);
+
+      if (savedWishlist) {
+        const parsed = JSON.parse(savedWishlist);
+
+        if (Array.isArray(parsed)) {
+          setWishlist(parsed);
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Unable to load wishlist:",
+        error
+      );
+    }
+  }, []);
+
+  /* =======================================================
+     WISHLIST
+  ======================================================= */
+
+  const handleWishlist = (product) => {
+    setWishlist((previous) => {
+      const exists = previous.some(
+        (item) => item.id === product.id
+      );
+
+      const updated = exists
+        ? previous.filter(
+            (item) => item.id !== product.id
+          )
+        : [...previous, product];
+
+      try {
+        localStorage.setItem(
+          WISHLIST_KEY,
+          JSON.stringify(updated)
+        );
+
+        window.dispatchEvent(
+          new Event("wishlistUpdated")
+        );
+      } catch (error) {
+        console.error(
+          "Unable to save wishlist:",
+          error
+        );
+      }
+
+      return updated;
+    });
   };
 
-  const addToCart = (product) => {
-    setCartMessage(`${product.name} added to your cart.`);
+  /* =======================================================
+     ADD TO CART
+  ======================================================= */
 
-    setTimeout(() => {
-      setCartMessage("");
-    }, 3000);
+  const handleAddToCart = (product) => {
+    try {
+      const savedCart =
+        localStorage.getItem(CART_KEY);
+
+      let cart = [];
+
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+
+        if (Array.isArray(parsed)) {
+          cart = parsed;
+        }
+      }
+
+      const existingIndex = cart.findIndex(
+        (item) => item.id === product.id
+      );
+
+      if (existingIndex !== -1) {
+        cart[existingIndex].quantity =
+          (Number(
+            cart[existingIndex].quantity
+          ) || 1) + 1;
+      } else {
+        cart.push({
+          ...product,
+          quantity: 1,
+        });
+      }
+
+      localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(cart)
+      );
+
+      window.dispatchEvent(
+        new Event("cartUpdated")
+      );
+    } catch (error) {
+      console.error(
+        "Unable to add product to cart:",
+        error
+      );
+    }
   };
+
+  /* =======================================================
+     FILTER + SORT
+  ======================================================= */
 
   const filteredProducts = useMemo(() => {
-    let products = [...newProducts];
+    let result = [...newProducts];
 
-    if (category !== "All") {
-      products = products.filter(
-        (product) => product.category === category
+    const search = searchTerm
+      .trim()
+      .toLowerCase();
+
+    if (search) {
+      result = result.filter(
+        (product) =>
+          product.name
+            .toLowerCase()
+            .includes(search) ||
+          product.category
+            .toLowerCase()
+            .includes(search) ||
+          product.description
+            .toLowerCase()
+            .includes(search)
       );
     }
 
-    if (search.trim()) {
-      const searchTerm = search.toLowerCase();
-
-      products = products.filter(
+    if (category !== "All") {
+      result = result.filter(
         (product) =>
-          product.name.toLowerCase().includes(searchTerm) ||
-          product.category.toLowerCase().includes(searchTerm)
+          product.category === category
       );
     }
 
     if (sortBy === "price-low") {
-      products.sort((a, b) => a.price - b.price);
+      result.sort(
+        (a, b) => a.price - b.price
+      );
     }
 
     if (sortBy === "price-high") {
-      products.sort((a, b) => b.price - a.price);
+      result.sort(
+        (a, b) => b.price - a.price
+      );
     }
 
     if (sortBy === "rating") {
-      products.sort((a, b) => b.rating - a.rating);
+      result.sort(
+        (a, b) => b.rating - a.rating
+      );
     }
 
-    return products;
-  }, [search, category, sortBy]);
+    if (sortBy === "name") {
+      result.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+    }
+
+    return result;
+  }, [searchTerm, category, sortBy]);
+
+  /* =======================================================
+     CLEAR FILTERS
+  ======================================================= */
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setCategory("All");
+    setSortBy("newest");
+  };
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800">
-      {/* =====================================================
-          CART NOTIFICATION
-      ====================================================== */}
-      {cartMessage && (
-        <div className="fixed right-4 top-24 z-[100] w-[calc(100%-2rem)] max-w-sm rounded-2xl border border-emerald-200 bg-white p-4 shadow-2xl">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-              <FaCheckCircle />
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-slate-900">
-                Added to Cart
-              </p>
-
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                {cartMessage}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setCartMessage("")}
-              className="ml-auto text-slate-400 transition hover:text-slate-700"
-              aria-label="Close notification"
-            >
-              <FaTimes />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================
+    <main className="min-h-screen bg-slate-50">
+      {/* ===================================================
           HERO
-      ====================================================== */}
+      =================================================== */}
+
       <section className="relative overflow-hidden bg-slate-950">
-        {/* Decorative background */}
-        <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-emerald-500/20 blur-3xl" />
+        {/* DECORATION */}
 
-        <div className="absolute -bottom-32 right-0 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl" />
 
-        <div className="absolute right-1/4 top-16 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl" />
+        <div className="absolute -bottom-32 -right-20 h-80 w-80 rounded-full bg-blue-500/20 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:py-20 lg:px-6 lg:py-24">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
-            {/* Hero content */}
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2">
-                <FaBolt className="text-emerald-400" />
+        <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-18 lg:px-8 lg:py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            {/* LABEL */}
 
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-300">
-                  Fresh Collection
-                </span>
-              </div>
-
-              <h1 className="mt-6 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Discover what's
-                <span className="text-emerald-400">
-                  {" "}new.
-                </span>
-              </h1>
-
-              <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base lg:text-lg">
-                Explore our latest products, fresh styles, new technology,
-                and trending essentials — carefully selected for your
-                everyday shopping.
-              </p>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#new-products"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 active:scale-[0.98]"
-                >
-                  Explore New Arrivals
-                  <FaArrowRight className="text-xs" />
-                </a>
-
-                <Link
-                  to="/deals"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10"
-                >
-                  View Deals
-                </Link>
-              </div>
-
-              {/* Hero stats */}
-              <div className="mt-10 grid max-w-xl grid-cols-3 gap-4 border-t border-white/10 pt-7">
-                <div>
-                  <p className="text-xl font-extrabold text-white sm:text-2xl">
-                    100+
-                  </p>
-
-                  <p className="mt-1 text-[11px] text-slate-400 sm:text-xs">
-                    New Products
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xl font-extrabold text-white sm:text-2xl">
-                    24/7
-                  </p>
-
-                  <p className="mt-1 text-[11px] text-slate-400 sm:text-xs">
-                    Support
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xl font-extrabold text-white sm:text-2xl">
-                    Secure
-                  </p>
-
-                  <p className="mt-1 text-[11px] text-slate-400 sm:text-xs">
-                    Shopping
-                  </p>
-                </div>
-              </div>
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-300">
+              <FaBolt />
+              Freshly Added
             </div>
 
-            {/* Hero visual */}
-            <div className="relative hidden lg:block">
-              <div className="relative mx-auto max-w-md">
-                <div className="absolute -inset-5 rounded-[2rem] bg-emerald-500/10 blur-2xl" />
+            {/* TITLE */}
 
-                <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-3 shadow-2xl">
-                  <img
-                    src={newProducts[0].image}
-                    alt="Latest ShopZone product"
-                    className="h-[390px] w-full rounded-[1.5rem] object-cover"
-                  />
-
-                  <div className="absolute bottom-7 left-7 right-7 rounded-2xl border border-white/10 bg-slate-950/85 p-4 backdrop-blur-xl">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-semibold text-emerald-400">
-                          JUST ARRIVED
-                        </p>
-
-                        <h3 className="mt-1 text-base font-bold text-white">
-                          {newProducts[0].name}
-                        </h3>
-                      </div>
-
-                      <div className="rounded-xl bg-emerald-600 px-3 py-2 text-sm font-extrabold text-white">
-                        New
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          BENEFITS
-      ====================================================== */}
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-6 lg:px-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                <FaShippingFast />
-              </div>
-
-              <div>
-                <p className="text-sm font-bold text-slate-900">
-                  Fast Delivery
-                </p>
-
-                <p className="mt-1 text-xs text-slate-500">
-                  Quick & reliable delivery
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                <FaBoxOpen />
-              </div>
-
-              <div>
-                <p className="text-sm font-bold text-slate-900">
-                  Fresh Products
-                </p>
-
-                <p className="mt-1 text-xs text-slate-500">
-                  Latest products added
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-                <FaCheckCircle />
-              </div>
-
-              <div>
-                <p className="text-sm font-bold text-slate-900">
-                  Trusted Shopping
-                </p>
-
-                <p className="mt-1 text-xs text-slate-500">
-                  Safe & secure checkout
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          PRODUCTS
-      ====================================================== */}
-      <section id="new-products" className="scroll-mt-24">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16 lg:px-6">
-          {/* Section heading */}
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">
-                Latest Products
+            <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+              New{" "}
+              <span className="text-emerald-400">
+                Arrivals
               </span>
+            </h1>
 
-              <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                New arrivals
-              </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base sm:leading-8">
+              Discover the latest products added to
+              SHOP ZONE. Find fresh styles, new
+              technology and exciting products.
+            </p>
 
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:text-base">
-                Be the first to discover the newest products available on
-                ShopZone.
-              </p>
-            </div>
+            {/* SEARCH */}
 
-            <div className="text-sm font-semibold text-slate-500">
-              <span className="font-bold text-emerald-600">
-                {filteredProducts.length}
-              </span>{" "}
-              products found
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-              {/* Search */}
-              <div className="relative w-full xl:max-w-md">
-                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400" />
+            <div className="mx-auto mt-8 max-w-2xl">
+              <div className="relative">
+                <FaSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
 
                 <input
                   type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search new products..."
-                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-10 text-sm text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
+                  value={searchTerm}
+                  onChange={(e) =>
+                    setSearchTerm(e.target.value)
+                  }
+                  placeholder="Search new arrivals..."
+                  className="h-14 w-full rounded-2xl border border-white/10 bg-white pl-13 pr-5 text-sm font-medium text-slate-800 outline-none shadow-xl transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/20 sm:text-base"
                 />
-
-                {search && (
-                  <button
-                    type="button"
-                    onClick={() => setSearch("")}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
-                    aria-label="Clear search"
-                  >
-                    <FaTimes />
-                  </button>
-                )}
-              </div>
-
-              {/* Categories */}
-              <div className="flex gap-2 overflow-x-auto pb-1 xl:flex-1 xl:justify-center">
-                {categories.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setCategory(item)}
-                    className={`whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-bold transition sm:text-sm ${
-                      category === item
-                        ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
-                        : "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-
-              {/* Sort */}
-              <div className="relative shrink-0">
-                <FaChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-slate-400" />
-
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="h-11 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 pr-10 text-sm font-semibold text-slate-700 outline-none transition focus:border-emerald-500 focus:bg-white sm:w-48"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="price-low">
-                    Price: Low to High
-                  </option>
-                  <option value="price-high">
-                    Price: High to Low
-                  </option>
-                  <option value="rating">Highest Rated</option>
-                </select>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Product Grid */}
-          {filteredProducts.length > 0 ? (
-            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredProducts.map((product) => {
-                const discount = Math.round(
-                  ((product.oldPrice - product.price) /
-                    product.oldPrice) *
-                    100
-                );
+      {/* ===================================================
+          FEATURE STRIP
+      =================================================== */}
 
-                const isWishlisted = wishlist.includes(product.id);
-
-                return (
-                  <article
-                    key={product.id}
-                    className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-xl"
-                  >
-                    {/* Product Image */}
-                    <div className="relative overflow-hidden bg-slate-100">
-                      <Link to={`/products/${product.id}`}>
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
-                        />
-                      </Link>
-
-                      {/* Badge */}
-                      <div className="absolute left-4 top-4">
-                        <span className="rounded-full bg-emerald-600 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-lg">
-                          {product.badge}
-                        </span>
-                      </div>
-
-                      {/* Discount */}
-                      <div className="absolute bottom-4 left-4">
-                        <span className="rounded-lg bg-white/95 px-2.5 py-1.5 text-xs font-extrabold text-rose-600 shadow-md backdrop-blur">
-                          -{discount}%
-                        </span>
-                      </div>
-
-                      {/* Wishlist */}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          toggleWishlist(product.id)
-                        }
-                        aria-label={
-                          isWishlisted
-                            ? "Remove from wishlist"
-                            : "Add to wishlist"
-                        }
-                        className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-xl backdrop-blur transition ${
-                          isWishlisted
-                            ? "bg-rose-500 text-white"
-                            : "bg-white/95 text-slate-500 hover:bg-emerald-600 hover:text-white"
-                        }`}
-                      >
-                        <FaHeart
-                          className={
-                            isWishlisted ? "text-sm" : "text-sm"
-                          }
-                        />
-                      </button>
-                    </div>
-
-                    {/* Product Details */}
-                    <div className="p-5">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">
-                        {product.category}
-                      </p>
-
-                      <Link to={`/products/${product.id}`}>
-                        <h3 className="mt-2 min-h-[48px] text-base font-extrabold leading-6 text-slate-900 transition hover:text-emerald-600">
-                          {product.name}
-                        </h3>
-                      </Link>
-
-                      {/* Rating */}
-                      <div className="mt-3 flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          <FaStar className="text-xs text-amber-400" />
-
-                          <span className="text-xs font-bold text-slate-700">
-                            {product.rating}
-                          </span>
-                        </div>
-
-                        <span className="text-xs text-slate-400">
-                          ({product.reviews} reviews)
-                        </span>
-                      </div>
-
-                      {/* Price */}
-                      <div className="mt-4 flex items-end gap-2">
-                        <span className="text-xl font-extrabold text-slate-900">
-                          Rs. {product.price.toLocaleString()}
-                        </span>
-
-                        <span className="pb-0.5 text-xs font-medium text-slate-400 line-through">
-                          Rs. {product.oldPrice.toLocaleString()}
-                        </span>
-                      </div>
-
-                      {/* Buttons */}
-                      <div className="mt-5 grid grid-cols-[1fr_auto] gap-2">
-                        <button
-                          type="button"
-                          onClick={() => addToCart(product)}
-                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white transition hover:bg-emerald-700 active:scale-[0.98] sm:text-sm"
-                        >
-                          <FaCartPlus />
-                          Add to Cart
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => setQuickView(product)}
-                          className="rounded-xl border border-slate-200 px-4 py-3 text-xs font-bold text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
-                        >
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+      <section className="relative z-10 mx-auto -mt-7 max-w-6xl px-4 sm:px-6">
+        <div className="grid overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 sm:grid-cols-3">
+          <div className="flex items-center gap-4 border-b border-slate-100 p-5 sm:border-b-0 sm:border-r">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <FaBolt />
             </div>
-          ) : (
-            /* Empty State */
-            <div className="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
-                <FaSearch className="text-xl" />
-              </div>
 
-              <h3 className="mt-5 text-xl font-extrabold text-slate-900">
-                No products found
-              </h3>
-
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                We couldn't find any new arrivals matching your search or
-                selected category.
+            <div>
+              <p className="text-sm font-black text-slate-900">
+                Fresh Products
               </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Recently added items
+              </p>
+            </div>
+          </div>
 
+          <div className="flex items-center gap-4 border-b border-slate-100 p-5 sm:border-b-0 sm:border-r">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <FaTag />
+            </div>
+
+            <div>
+              <p className="text-sm font-black text-slate-900">
+                Special Prices
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Great introductory offers
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 p-5">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+              <FaStar />
+            </div>
+
+            <div>
+              <p className="text-sm font-black text-slate-900">
+                Quality Products
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                Rated by our customers
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================
+          PRODUCTS SECTION
+      =================================================== */}
+
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        {/* SECTION HEADER */}
+
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="mb-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-600">
+              Latest Products
+            </p>
+
+            <h2 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+              Explore New Arrivals
+            </h2>
+
+            <p className="mt-2 text-sm text-slate-500">
+              Showing{" "}
+              <span className="font-bold text-slate-700">
+                {filteredProducts.length}
+              </span>{" "}
+              new products
+            </p>
+          </div>
+
+          {/* MOBILE FILTER BUTTON */}
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowFilters(!showFilters)
+            }
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm lg:hidden"
+          >
+            <FaFilter />
+            Filters & Sort
+            <FaChevronDown
+              className={`text-xs transition-transform ${
+                showFilters
+                  ? "rotate-180"
+                  : ""
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* =================================================
+            FILTER BAR
+        ================================================= */}
+
+        <div
+          className={`mt-7 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${
+            showFilters ? "block" : "hidden lg:block"
+          }`}
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            {/* CATEGORIES */}
+
+            <div className="flex flex-wrap gap-2">
+              {categories.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() =>
+                    setCategory(item)
+                  }
+                  className={`rounded-xl px-4 py-2.5 text-xs font-bold transition ${
+                    category === item
+                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
+                      : "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+
+            {/* SORT */}
+
+            <div className="relative min-w-[190px]">
+              <select
+                value={sortBy}
+                onChange={(e) =>
+                  setSortBy(e.target.value)
+                }
+                className="h-11 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 pr-10 text-sm font-bold text-slate-700 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+              >
+                <option value="newest">
+                  Newest First
+                </option>
+                <option value="price-low">
+                  Price: Low to High
+                </option>
+                <option value="price-high">
+                  Price: High to Low
+                </option>
+                <option value="rating">
+                  Highest Rated
+                </option>
+                <option value="name">
+                  Name: A-Z
+                </option>
+              </select>
+
+              <FaChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
+            </div>
+          </div>
+        </div>
+
+        {/* =================================================
+            ACTIVE SEARCH
+        ================================================= */}
+
+        {(searchTerm || category !== "All") && (
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-slate-500">
+              Active filters:
+            </span>
+
+            {searchTerm && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearch("");
-                  setCategory("All");
-                }}
-                className="mt-6 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-emerald-700"
+                onClick={() => setSearchTerm("")}
+                className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700"
               >
-                Clear Filters
+                Search: "{searchTerm}"
+                <FaTimes className="text-[9px]" />
               </button>
-            </div>
-          )}
-        </div>
-      </section>
+            )}
 
-      {/* =====================================================
-          NEWSLETTER CTA
-      ====================================================== */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 pb-16 lg:px-6">
-          <div className="relative overflow-hidden rounded-3xl bg-emerald-600 px-6 py-12 shadow-xl shadow-emerald-600/20 sm:px-10 lg:py-14">
-            <div className="absolute -left-20 -top-24 h-64 w-64 rounded-full bg-white/10" />
-
-            <div className="absolute -bottom-32 -right-16 h-72 w-72 rounded-full bg-white/10" />
-
-            <div className="relative mx-auto max-w-3xl text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-white">
-                <FaBolt className="text-2xl" />
-              </div>
-
-              <h2 className="mt-5 text-2xl font-extrabold text-white sm:text-3xl">
-                Don't miss the next drop.
-              </h2>
-
-              <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-emerald-50 sm:text-base">
-                Keep checking ShopZone for the latest products, trending
-                styles, and exciting new arrivals.
-              </p>
-
-              <Link
-                to="/products"
-                className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-emerald-700 shadow-lg transition hover:bg-emerald-50"
+            {category !== "All" && (
+              <button
+                type="button"
+                onClick={() => setCategory("All")}
+                className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700"
               >
-                Explore All Products
-                <FaArrowRight className="text-xs" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+                {category}
+                <FaTimes className="text-[9px]" />
+              </button>
+            )}
 
-      {/* =====================================================
-          QUICK VIEW MODAL
-      ====================================================== */}
-      {quickView && (
-        <div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
-          onClick={() => setQuickView(null)}
-        >
-          <div
-            className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close */}
             <button
               type="button"
-              onClick={() => setQuickView(null)}
-              aria-label="Close quick view"
-              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-slate-600 shadow-lg backdrop-blur transition hover:bg-slate-100"
+              onClick={clearFilters}
+              className="text-xs font-bold text-rose-500 hover:text-rose-600"
             >
-              <FaTimes />
+              Clear All
             </button>
+          </div>
+        )}
 
-            <div className="grid md:grid-cols-2">
-              {/* Image */}
-              <div className="bg-slate-100">
-                <img
-                  src={quickView.image}
-                  alt={quickView.name}
-                  className="h-full min-h-[320px] w-full object-cover"
-                />
-              </div>
+        {/* =================================================
+            PRODUCT GRID
+        ================================================= */}
 
-              {/* Content */}
-              <div className="p-6 sm:p-8">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
-                  {quickView.category}
-                </span>
+        {filteredProducts.length > 0 ? (
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                isWishlisted={wishlist.some(
+                  (item) =>
+                    item.id === product.id
+                )}
+                onWishlist={handleWishlist}
+                onAddToCart={handleAddToCart}
+              />
+            ))}
+          </div>
+        ) : (
+          /* =================================================
+             EMPTY STATE
+          ================================================= */
 
-                <h2 className="mt-2 text-2xl font-extrabold leading-tight text-slate-900">
-                  {quickView.name}
+          <div className="mt-8 rounded-3xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+              <FaSearch className="text-xl" />
+            </div>
+
+            <h3 className="mt-5 text-xl font-black text-slate-900">
+              No new arrivals found
+            </h3>
+
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+              We couldn't find any products matching
+              your current search or filters.
+            </p>
+
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="mt-6 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-black text-white transition hover:bg-emerald-700"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* ===================================================
+          CTA
+      =================================================== */}
+
+      <section className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="overflow-hidden rounded-3xl bg-slate-950">
+            <div className="relative px-6 py-12 text-center sm:px-10 sm:py-16">
+              <div className="absolute -left-20 -top-20 h-48 w-48 rounded-full bg-emerald-500/20 blur-3xl" />
+
+              <div className="absolute -bottom-20 -right-20 h-48 w-48 rounded-full bg-blue-500/20 blur-3xl" />
+
+              <div className="relative">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400">
+                  <FaCheck />
+                </div>
+
+                <h2 className="mt-5 text-2xl font-black text-white sm:text-3xl">
+                  Don't miss what's new
                 </h2>
 
-                <div className="mt-4 flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <FaStar className="text-sm text-amber-400" />
-
-                    <span className="text-sm font-bold">
-                      {quickView.rating}
-                    </span>
-                  </div>
-
-                  <span className="text-sm text-slate-400">
-                    ({quickView.reviews} reviews)
-                  </span>
-                </div>
-
-                <div className="mt-6 flex items-center gap-3">
-                  <span className="text-2xl font-extrabold text-slate-900">
-                    Rs. {quickView.price.toLocaleString()}
-                  </span>
-
-                  <span className="text-sm text-slate-400 line-through">
-                    Rs. {quickView.oldPrice.toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="mt-6 rounded-2xl bg-emerald-50 p-4">
-                  <div className="flex items-center gap-3">
-                    <FaCheckCircle className="text-emerald-600" />
-
-                    <p className="text-sm font-semibold text-emerald-800">
-                      New arrival — available now
-                    </p>
-                  </div>
-                </div>
-
-                <p className="mt-6 text-sm leading-6 text-slate-500">
-                  Discover this latest addition to the ShopZone collection.
-                  Enjoy a convenient shopping experience with secure checkout
-                  and reliable delivery.
+                <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-300">
+                  Explore our complete product collection
+                  and discover more products for your
+                  everyday needs.
                 </p>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    addToCart(quickView);
-                    setQuickView(null);
-                  }}
-                  className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700"
+                <Link
+                  to="/products"
+                  className="mt-7 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500"
                 >
-                  <FaCartPlus />
-                  Add to Cart
-                </button>
+                  View All Products
+                  <FaArrowRight className="text-xs" />
+                </Link>
               </div>
             </div>
           </div>
         </div>
-      )}
+      </section>
     </main>
   );
 };

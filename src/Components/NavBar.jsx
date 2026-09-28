@@ -368,13 +368,13 @@ const Navbar = () => {
 
               <NavLink
                 to="/deals"
-                className={navLinkClass}
+                className={navLinkClass}log
               >
                 Deals
               </NavLink>
 
               <NavLink
-                to="/new-arrivals"
+                to="/-arrivalsnew"
                 className={navLinkClass}
               >
                 New Arrivals

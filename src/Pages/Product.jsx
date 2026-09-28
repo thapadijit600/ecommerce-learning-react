@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   FaSearch,
@@ -28,6 +28,7 @@ const CART_KEY = "shop_zone_cart";
 const productsData = [
   {
     id: 1,
+    slug: "premium-running-shoes",
     name: "Premium Running Shoes",
     category: "Fashion",
     price: 3499,
@@ -44,6 +45,7 @@ const productsData = [
 
   {
     id: 2,
+    slug: "wireless-headphones",
     name: "Wireless Headphones",
     category: "Electronics",
     price: 2499,
@@ -60,6 +62,7 @@ const productsData = [
 
   {
     id: 3,
+    slug: "smart-watch-pro",
     name: "Smart Watch Pro",
     category: "Electronics",
     price: 4299,
@@ -76,6 +79,7 @@ const productsData = [
 
   {
     id: 4,
+    slug: "casual-denim-jacket",
     name: "Casual Denim Jacket",
     category: "Fashion",
     price: 2799,
@@ -92,6 +96,7 @@ const productsData = [
 
   {
     id: 5,
+    slug: "modern-backpack",
     name: "Modern Backpack",
     category: "Accessories",
     price: 1599,
@@ -108,6 +113,7 @@ const productsData = [
 
   {
     id: 6,
+    slug: "bluetooth-speaker",
     name: "Bluetooth Speaker",
     category: "Electronics",
     price: 1899,
@@ -124,6 +130,7 @@ const productsData = [
 
   {
     id: 7,
+    slug: "fitness-smart-band",
     name: "Fitness Smart Band",
     category: "Sports",
     price: 1299,
@@ -140,6 +147,7 @@ const productsData = [
 
   {
     id: 8,
+    slug: "premium-sunglasses",
     name: "Premium Sunglasses",
     category: "Accessories",
     price: 999,
@@ -156,6 +164,7 @@ const productsData = [
 
   {
     id: 9,
+    slug: "kitchen-blender",
     name: "Kitchen Blender",
     category: "Home & Living",
     price: 2199,
@@ -172,6 +181,7 @@ const productsData = [
 
   {
     id: 10,
+    slug: "skincare-essentials-set",
     name: "Skincare Essentials Set",
     category: "Beauty",
     price: 1799,
@@ -188,6 +198,7 @@ const productsData = [
 
   {
     id: 11,
+    slug: "classic-sneakers",
     name: "Classic Sneakers",
     category: "Fashion",
     price: 2999,
@@ -204,6 +215,7 @@ const productsData = [
 
   {
     id: 12,
+    slug: "wireless-gaming-mouse",
     name: "Wireless Gaming Mouse",
     category: "Electronics",
     price: 1799,
@@ -253,7 +265,7 @@ const ProductCard = ({
     <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl">
       {/* IMAGE */}
       <div className="relative aspect-square overflow-hidden bg-slate-100">
-        <Link to={`/products/${product.id}`}>
+        <Link to={`/products/${product.slug}`}>
           <img
             src={product.image}
             alt={product.name}
@@ -302,7 +314,7 @@ const ProductCard = ({
 
         {/* QUICK VIEW */}
         <Link
-          to={`/products/${product.id}`}
+          to={`/products/${product.slug}`}
           className="absolute bottom-3 left-3 hidden items-center gap-2 rounded-lg bg-slate-900/90 px-3 py-2 text-xs font-bold text-white opacity-0 backdrop-blur transition-all group-hover:flex group-hover:opacity-100"
         >
           View Product
@@ -317,7 +329,7 @@ const ProductCard = ({
         </p>
 
         <Link
-          to={`/products/${product.id}`}
+          to={`/products/${product.slug}`}
           className="line-clamp-2 min-h-[48px] text-base font-bold text-slate-900 transition hover:text-emerald-600 sm:text-lg"
         >
           {product.name}
@@ -399,12 +411,26 @@ const Product = () => {
   const urlSearch = searchParams.get("search") || "";
 
   const [searchTerm, setSearchTerm] = useState(urlSearch);
+
+  /* =======================================================
+     SYNC NAVBAR SEARCH WITH PRODUCTS PAGE
+  ======================================================= */
+
+  useEffect(() => {
+    setSearchTerm(urlSearch);
+  }, [urlSearch]);
+
   const [selectedCategory, setSelectedCategory] =
     useState("All Products");
+
   const [sortBy, setSortBy] = useState("recommended");
+
   const [priceRange, setPriceRange] = useState("all");
+
   const [ratingFilter, setRatingFilter] = useState("all");
+
   const [showFilters, setShowFilters] = useState(false);
+
   const [wishlist, setWishlist] = useState([]);
 
   /* =======================================================
@@ -423,7 +449,7 @@ const Product = () => {
 
   /* =======================================================
      ADD TO CART
-     
+
      NO TOAST / NO NOTIFICATION HERE.
 
      The Navbar listens to "cartUpdated" and changes
@@ -497,7 +523,10 @@ const Product = () => {
 
       window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
-      console.error("Unable to add product to cart:", error);
+      console.error(
+        "Unable to add product to cart:",
+        error
+      );
     }
   };
 
@@ -513,11 +542,20 @@ const Product = () => {
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase().trim();
 
-      result = result.filter(
-        (product) =>
-          product.name.toLowerCase().includes(search) ||
-          product.category.toLowerCase().includes(search)
-      );
+      result = result.filter((product) => {
+        const searchableText = [
+          product.name,
+          product.category,
+          product.description,
+          product.badge,
+          product.slug,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return searchableText.includes(search);
+      });
     }
 
     /* CATEGORY */
@@ -698,7 +736,10 @@ const Product = () => {
               className="flex h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 transition hover:border-emerald-500 hover:text-emerald-600 lg:hidden"
             >
               <FaSlidersH />
-              {showFilters ? "Hide Filters" : "Filters"}
+
+              {showFilters
+                ? "Hide Filters"
+                : "Filters"}
             </button>
 
             {/* SORT */}
@@ -1036,3 +1077,4 @@ const Product = () => {
 };
 
 export default Product;
+
